@@ -16,45 +16,77 @@ server.listen(app.get('port'), function () {
 
 mongoose.connect('buckybronco:gobroncos2016@ds061371.mongolab.com:61371/test_db');
 
- // //Context.io initialization:
- //  var ContextIO = require('contextio');
- //  var ctxioClient = new ContextIO.Client({
-   	
- //  });
+//ContextIO setup stuff for REST calls through the CIO client! Be cool, don't touch the secret.
+var ContextIO = require('contextio');
+var contextIOClient = new ContextIO.Client({
+	key: "6o5bljnr",
+	secret: "mgMC5BOA7y510IFF"
+});
 
 
-
-app.get('/storeEmails', function(request, response){
+app.get('/emails', function(request, response){
 	//Assume, at this stage: black box, authentication and everything done and in GET /storeEmails we'll be able to get the JSON with all the email messages from context.io.
 	//This object will be whittled down to the email schema currently seen in the route, and the fields will be set appropriately. 
-	var Schema = mongoose.Schema;
 	
-	var messageSchema = new Schema({
-		subject: String, 
-		body: String
-	});
+	var Schema = mongoose.Schema;
 
-	var email = new Schema({
+	var userData = new Schema({
 	    emailId: String,
 	    account_Id: String,
-	    messages: [messageSchema]
+	    relevantData: [String]
 	});
 
 
-	var emailModel = mongoose.model("emailModel", email, "emails");
-	var userEmail = new emailModel();
-	
-	var arrayOfMessageObjects = [{"subject":"Message 1", "body": "I am message 1"}, {"subject":"Message 2", "body": "I am message 2"}, {"subject":"Message 3", "body": "I am message 3"}];
-	
-	userEmail.emailId = "aditprab@gmail.com";
-	userEmail.account_Id = "324091";
-	userEmail.messages = arrayOfMessageObjects;
 
-	
-	userEmail.save(function(err) {
-            console.log("NAME SCHEMA CREATED");
-            console.log(userEmail);
-        });
+	var userDataModel = mongoose.model("userDataModel", userData, "user_data");
+	var userData = new userDataModel();
+
+
+	var emailAddress = request.query.email;
+	var accountId; 
+
+	contextIOClient.accounts().get({email:emailAddress}, function (err, response) {
+		//Blocking callback to GET /accounts.
+		    if (err) 
+		    	throw err;
+		   
+    		accountId = response.body[0].id;
+    		console.log(accountId);
+
+
+    		var senders = ["ship-confirm@amazon.com"]; //Add more addresses here.
+
+    			//Make call to get messages, with this accountId.
+    			//send sender, subject, body to parsing module.
+    			var jsonArray = [];
+    			var sender;
+    			var subject;
+    			var body;
+    			for(var i=0; i < senders.length; i++){
+    				contextIOClient.accounts(accountId).messages().get({id:accountId, from:senders[i], include_body:1, body_type: "text/html"}, function (err, response) {
+    					sender = response.body[0].addresses.from.email;
+    					subject = response.body[0].subject;
+    					body = response.body[0].body[0].content;
+    					console.log("Sender:" + sender);
+    					console.log("Subject:" + subject);
+    					console.log("Body:" + body);
+    				});	
+    			}
+
+
+
+    			//Pass through userData scheme to store in DB.
+  			  	// userData.emailId = emailAddress;
+				// userData.account_Id = accountId;
+				// userData.relevantData = relevantData;
+				// userData.save(function(err) {
+			 	//            console.log("User Data CREATED");
+			 	//            console.log(userData);
+			 	//        });
+
+		
+	});
+
         
 });
 
