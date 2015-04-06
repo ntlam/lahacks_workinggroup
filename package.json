@@ -1,7 +1,7 @@
 {
   "name": "LAHacks",
   "version": "1.0.0",
-  "description": "Creeper",
+  "description": "Uses context.io to pull emails from user's inbox, then parses them to create marketing profiles.",
   "author": "Adithya Prabhakaran",
   "license": "ISC",
   "private": true,
