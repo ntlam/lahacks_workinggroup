@@ -59,7 +59,7 @@ app.get('/emails', function(request, response){
     			//Make call to get messages, with this accountId.
     			//send sender, subject, body to parsing module.
     			var jsonArray = [];
-    			var json = {};
+    			var tempJSON = {};
     			var sender;
     			var subject;
     			var body;
@@ -71,8 +71,8 @@ app.get('/emails', function(request, response){
     					console.log("Sender:" + sender);
     					console.log("Subject:" + subject);
     					console.log("Body:" + body);
-    					json = {"sender":sender, "subject":subject, "body":body};
-    					jsonArray.push(json);
+    					tempJSON = {"sender":sender, "subject":subject, "body":body};
+    					jsonArray.push(tempJSON);
     				});	
     			}
 

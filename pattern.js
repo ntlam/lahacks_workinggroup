@@ -1,4 +1,4 @@
-/* This module implements a pattern matching system contingent on an email's sender. If email is sent by a sender with a known pattern, we can apply the pattern and collect relevant information from the email. */
+/* This module implements a pattern recognition system contingent on an email's sender. If email is sent by a sender with a known pattern, we can apply the pattern and collect relevant information from the email. */
 
 /* json_object expected to be of form 
  * {
